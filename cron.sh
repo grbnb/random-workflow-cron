@@ -11,26 +11,42 @@ fi
 # Get interval count (default is 2)
 interval_count=${interval_count:-2}
 
+# Correct the time zone to UTC+0
+time_zone=${time_zone:-'UTC+0'}
+time_diff=$(echo $time_zone | sed 's/^[^+-]*//') && time_num=${time_diff:1} && time_sign=${time_diff:0:1}
+[ ${time_num%.*} -lt 0 -o ${time_num%.*} -gt 12 ] && echo "Current $time_zone not supported!!" && exit 1
+[ ${time_sign} == "+" ] && operator="-"
+[ ${time_sign} == "-" ] && operator="+"
+hour_start_utc=$(($hour_start ${operator} ${time_num%.*}))
+[ $hour_start_utc -lt 0 ] && hour_start_utc=$(($hour_start_utc + 24))
+hour_end_utc=$(($hour_end ${operator} ${time_num%.*}))
+[ $hour_end_utc -lt 0 ] || [ $hour_start_utc -gt $hour_end_utc ] && hour_end_utc=$(($hour_end_utc + 24))
+
 # Divide into n intervals of equal length
-interval_length=$(( ($hour_end - $hour_start + 1) / $interval_count ))
+interval_length=$(( ($hour_end_utc - $hour_start_utc + 1) / $interval_count ))
+remainder=$(( ($hour_end_utc - $hour_start_utc + 1) % $interval_count ))
 
 # If the length of each interval is less than 1 hour, output an error message and exit
-if [ $interval_length -lt 1 ]; then
-  echo "Interval length is less than 1 hour. Please reduce the number of intervals or modify the hour range."
-  exit 0
-fi
+[ $interval_length -lt 1 ] && echo "Interval length is less than 1 hour. Please reduce the number of intervals or modify the hour range." && exit 1
 
 # Construct a list of intervals
+for ((i = 1; i <= interval_count; i++)); do
+    (( i <= remainder )) && array[i-1]=$(( interval_length + 1 )) || array[i-1]=$interval_length
+done
+sorted=( $(shuf -e "${array[@]}") )
+echo "Length of each interval: ( ${sorted[@]} )"
+interval_start=$hour_start_utc
 intervals=()
 for ((i = 1; i <= interval_count; i++)); do
-    interval_start=$((hour_start + (i - 1) * interval_length))
-    interval_end=$((interval_start + interval_length - 1))
+    interval_end=$((interval_start + ${sorted[i-1]} - 1))
     intervals+=("$interval_start-$interval_end")
     echo "Interval $i: $interval_start-$interval_end"
+    interval_start=$((interval_end + 1))
 done
 
 # Get the interval that the current time falls into
 current_hour=$(date +%H)
+[[ $current_hour -lt $hour_start_utc ]] && current_hour=$(( $current_hour + 24))
 for ((i = 0; i < interval_count; i++)); do
     interval=${intervals[i]}
     interval_start=${interval%-*}
@@ -59,6 +75,7 @@ for interval in "${intervals[@]}"; do
     else
         random_hour=$((RANDOM % (interval_end - interval_start + 1) + interval_start))
     fi
+    [ $random_hour -ge 24 ] && random_hour=$((random_hour - 24))
     cron_hours="$cron_hours$random_hour,"
 done
 # Remove trailing comma
