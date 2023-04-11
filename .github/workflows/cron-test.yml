@@ -13,19 +13,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@main
         with:
           #ref_branch: main
           #author: ${{ secrets.AUTHOR }}
+          github_token: ${{ secrets.PAT }}
           keep_history: true
+          time_zone: "UTC+8"
           hour_start: 0
           hour_end: 21
           interval_count: 7

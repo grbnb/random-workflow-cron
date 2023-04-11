@@ -1,4 +1,4 @@
-name: Random Cron
+name: Random Workflows Cron
 description: 'Generate a random cron expression based on the current time and specified number of intervals.'
 author: 'grbnb'
 branding:
@@ -15,8 +15,8 @@ inputs:
     required: false
     default: true
   github_token:
-    description: 'GitHub token or PAT token'
-    required: false
+    description: 'GitHub api token [PAT] The key must have repo and workflow permissions'
+    required: true
     default: ${{ github.token }}
   repository:
     description: 'The owner and repository name'
@@ -34,6 +34,9 @@ inputs:
     description: 'The author name and email address to push commit.'
     required: false
     default: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+  time_zone:
+    description: "The time zone of the user's region, with a range of UTC±12 (default UTC+0)."
+    required: false
   hour_start:
     description: 'Define the intervals start hour (default 0).'
     required: false
@@ -50,6 +53,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
+  - if: ${{ inputs.push_switch == 'true' }}
+    uses: actions/checkout@v3
+    with:
+      token: ${{ inputs.github_token }}
+      repository: ${{ inputs.repository }}
+      ref: ${{ inputs.ref_branch }}
+      fetch-depth: 2
   - shell: bash
     run: bash ${{ github.action_path }}/cron.sh
     env:
@@ -60,6 +70,7 @@ runs:
       ref_branch: ${{ inputs.ref_branch }}
       keep_history: ${{ inputs.keep_history }}
       author: ${{ inputs.author }}
+      time_zone: ${{ inputs.time_zone }}
       hour_start: ${{ inputs.hour_start }}
       hour_end: ${{ inputs.hour_end }}
       interval_count: ${{ inputs.interval_count }}
