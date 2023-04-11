@@ -1,0 +1,66 @@
+name: Random Cron
+description: 'Generate a random cron expression based on the current time and specified number of intervals.'
+author: 'grbnb'
+branding:
+  icon: upload-cloud
+  color: green
+
+inputs:
+  workflow_name:
+    description: 'Workflow_filename path to be modified'
+    required: true
+    default: ${{ github.workflow_ref }}  # e.g. grbnb/random-workflow-cron/.github/workflow/cron.yml@refs/heads/main
+  push_switch:
+    description: 'The modified workflow_file push or not at once'
+    required: false
+    default: true
+  github_token:
+    description: 'GitHub token or PAT token'
+    required: false
+    default: ${{ github.token }}
+  repository:
+    description: 'The owner and repository name'
+    required: false
+    default: ${{ github.repository }}  # e.g. grbnb/random-workflow-cron
+  ref_branch:
+    description: 'The modified workflow_file push to destination branch'
+    required: false
+    default: ${{ github.ref_name }}  # e.g. main
+  keep_history:
+    description: 'Keep the workflow_file history commit message.'
+    required: false
+    default: false
+  author:
+    description: 'The author name and email address to push commit.'
+    required: false
+    default: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+  hour_start:
+    description: 'Define the intervals start hour (default 0).'
+    required: false
+  hour_end:
+    description: 'Define the intervals end hour (default 23).'
+    required: false
+  interval_count:
+    description: 'Number of intervals to divide the day into (default 2).'
+    required: false
+  cron_dmw:
+    description: 'Custom cron DayofMonth Month DayofWeek (default "* * *").'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+  - shell: bash
+    run: bash ${{ github.action_path }}/cron.sh
+    env:
+      workflow_name: ${{ inputs.workflow_name }}
+      push_switch: ${{ inputs.push_switch }}
+      github_token: ${{ inputs.github_token }}
+      repository: ${{ inputs.repository }}
+      ref_branch: ${{ inputs.ref_branch }}
+      keep_history: ${{ inputs.keep_history }}
+      author: ${{ inputs.author }}
+      hour_start: ${{ inputs.hour_start }}
+      hour_end: ${{ inputs.hour_end }}
+      interval_count: ${{ inputs.interval_count }}
+      cron_dmw: ${{ inputs.cron_dmw }}

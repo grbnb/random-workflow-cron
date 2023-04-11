@@ -1,0 +1,43 @@
+
+name: 'test'
+
+on:
+  #schedule:
+    #- cron: '0 0 */7 * *'
+    #- cron: '5 16 1,2,5 * *'
+  # 点击star时触发运行
+  #watch:
+    #types: started
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: test
+        env:
+          workflow_name: ${{ github.workflow_ref }}
+          push_switch: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          ref_branch: ${{ github.ref_name }}
+          keep_history: true
+          author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          hour_start: 1
+          hour_end: 21
+          interval_count: 7
+          cron_dmw: "*/5 * *"
+        run: |
+          workflow_name=$(echo "${workflow_name}" | sed 's/^[^.]*\///;s/@.*$//')
+          cat ${workflow_name}
+          bash ./cron.sh
+          cat ${workflow_name}
+          
+
