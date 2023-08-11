@@ -45,7 +45,7 @@ for ((i = 1; i <= interval_count; i++)); do
 done
 
 # Get the interval that the current time falls into
-current_hour=$(date +%H)
+current_hour=$(date +%-H)
 [[ $current_hour -lt $hour_start_utc ]] && current_hour=$(( $current_hour + 24))
 for ((i = 0; i < interval_count; i++)); do
     interval=${intervals[i]}
@@ -83,7 +83,7 @@ cron_hours=${cron_hours%?}
 
 # Generate a random minute (0~59). If the current hour is in the last interval, the minute should be less than or equal to the current minute.
 if [ $current_interval ] && [ $current_interval -eq $((interval_count - 1)) ] && [ $current_hour -eq $random_hour ]; then
-    current_minute=$(date +%M)
+    current_minute=$(date +%-M)
     cron_minute=$((RANDOM % (current_minute + 1)))
 else
     cron_minute=$((RANDOM % 60))
