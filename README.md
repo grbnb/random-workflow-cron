@@ -28,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
           fetch-depth: 2
       
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@v1
         with:
           keep_history: true
 ```
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.repository }}
@@ -62,14 +62,14 @@ jobs:
           fetch-depth: 2
       
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@v1
         with:
           workflow_name: ".github/workflows/ci.yml"
           ref_branch: dev
           keep_history: true
 ```
 
-Set the random hour range to `1-21` [UTC+8 time zone], running only 5 times a day every 15 days, but not immediately pushing and commit to the repository. This means that there are push operations in the steps after the workflow file, avoiding multiple push operations!!!
+Set the random hour range to `1-21` [UTC+8 time zone], running only 7 times a day every 15 days, but not immediately pushing and commit to the repository. This means that there are push operations in the steps after the workflow file, avoiding multiple push operations!!!
 
 ```yml
 name: 'random-cron'
@@ -84,12 +84,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
       
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@v1
         with:
           push_switch: false
           time_zone: "UTC+8"
@@ -145,7 +145,7 @@ Error: Invalid exit code: 128
 Add GitHub API `token` key to your workflow yml file at `uses: actions/checkout@v3` in step
 ```yml
 - name: Checkout
-  uses: actions/checkout@v3
+  uses: actions/checkout@v4
   with:
     token: ${{ secrets.PAT }}
     fetch-depth: 2

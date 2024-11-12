@@ -28,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
           fetch-depth: 2
       
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@v1
         with:
           github_token: ${{ secrets.PAT }}
           keep_history: true
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.repository }}
@@ -63,7 +63,7 @@ jobs:
           fetch-depth: 2
       
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@v1
         with:
           workflow_name: ".github/workflows/ci.yml"
           github_token: ${{ secrets.PAT }}
@@ -71,7 +71,7 @@ jobs:
           keep_history: true
 ```
 
-设置随机小时范围为`1-21`[UTC+8时区]，每间隔15天并且一天只运行5次， 但是不立即推送提交到仓库，即工作流文件后面的步骤存在推送操作，避免多次推送！！！
+设置随机小时范围为`1-21`[UTC+8时区]，每间隔15天并且一天只运行7次， 但是不立即推送提交到仓库，即工作流文件后面的步骤存在推送操作，避免多次推送！！！
 
 ```yml
 name: 'random-cron'
@@ -86,12 +86,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
       
       - name: Random Cron
-        uses: grbnb/random-workflow-cron@dev
+        uses: grbnb/random-workflow-cron@v1
         with:
           push_switch: false
           time_zone: "UTC+8"
@@ -147,7 +147,7 @@ Error: Invalid exit code: 128
 添加GitHub API `token`密钥到工作流yml文件的`uses:actions/checkout@v3`步骤中
 ```yml
 - name: Checkout
-  uses: actions/checkout@v3
+  uses: actions/checkout@v4
   with:
     token: ${{ secrets.PAT }}
     fetch-depth: 2
