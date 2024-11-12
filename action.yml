@@ -54,14 +54,14 @@ runs:
   using: 'composite'
   steps:
   - if: ${{ inputs.push_switch == 'true' }}
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
     with:
       token: ${{ inputs.github_token }}
       repository: ${{ inputs.repository }}
       ref: ${{ inputs.ref_branch }}
       fetch-depth: 2
   - shell: bash
-    run: bash ${{ github.action_path }}/cron.sh
+    run: bash "${{ github.action_path }}/cron.sh"
     env:
       workflow_name: ${{ inputs.workflow_name }}
       push_switch: ${{ inputs.push_switch }}
