@@ -99,7 +99,7 @@ echo "Generated cron expression: $cron_expression"
 # Replace the cron expression in the YAML file
 workflow_name=${workflow_name}
 workflow_path=$(echo "${workflow_name}" | sed 's/^[^.]*\///;s/@.*$//')
-sed -i "/^[^#]*schedule:/,+5{ /#/! s@cron: .*['\"]\?@cron: \"$cron_expression\"@; }" ${workflow_path}
+sed -i -E "/^[^#]*schedule:/,+5 {/#.*cron:/! s@^(.*cron:.*)['\"][^'\"]+['\"](.*)@\1\"$cron_expression\"\2@}" ${workflow_path}
 
 # Commit the modified YAML file to the repository
 push_switch=${push_switch}
@@ -121,18 +121,20 @@ if [[ $push_switch == true ]]; then
             git add $workflow_path
             git stash -u -k
             git commit --amend --reset-author -m "Update Random Cron"
-            git stash pop
             git reflog expire --expire=now --expire-unreachable=now --all
             git gc --aggressive --prune=now
             git push -f origin ${ref_branch}
+            #git stash pop
         else
             git add $workflow_path
             git stash -u -k
             git commit -m "Update Random Cron"
-            git stash pop
             git push origin ${ref_branch}
+            #git stash pop
         fi
     else
+        git add $workflow_path
+        git stash -u -k
         git checkout --orphan tmp_branch
         git rm -rf --cached .
         git add -A
@@ -140,6 +142,7 @@ if [[ $push_switch == true ]]; then
         git show-ref -q --heads ${ref_branch} && git branch -D ${ref_branch}
         git branch -m ${ref_branch}
         git push -f origin ${ref_branch}
+        #git stash pop
     fi
 fi
 
