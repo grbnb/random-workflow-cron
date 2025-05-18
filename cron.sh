@@ -99,7 +99,7 @@ echo "Generated cron expression: $cron_expression"
 # Replace the cron expression in the YAML file
 workflow_name=${workflow_name}
 workflow_path=$(echo "${workflow_name}" | sed 's/^[^.]*\///;s/@.*$//')
-sed -i "/^[^#]*schedule:/,+5{ /#/! s@cron: .*['\"]\?@cron: \"$cron_expression\"@; }" ${workflow_path}
+sed -i -E "/^[^#]*schedule:/,+5 {/#.*cron:/! s@^(.*cron:.*)['\"][^'\"]+['\"](.*)@\1\"$cron_expression\"\2@}" ${workflow_path}
 
 # Commit the modified YAML file to the repository
 push_switch=${push_switch}
